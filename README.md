@@ -2,7 +2,7 @@
 
 Docker-compose configuration to set-up 
 [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) with redis and \
-[rclone](https://rclone.org].
+[rclone](https://rclone.org).
 
 Rclone is used to sync the scans on an cloud storage to Paperless.
 
