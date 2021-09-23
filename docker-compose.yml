@@ -1,0 +1,35 @@
+version: "3.4"
+services:
+  broker:
+    image: redis:6.0
+    restart: always
+ 
+  webserver:
+    image: jonaswinkler/paperless-ng:1.5.0
+    restart: always
+    depends_on:
+      - broker
+    ports:
+      - 8005:8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./paperless/data:/usr/src/paperless/data
+      - ./paperless/media:/usr/src/paperless/media
+      - ./paperless/export:/usr/src/paperless/export
+      - ./paperless/consume:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+ 
+  rclone:
+    image: rclone/rclone
+    restart: always
+    volumes:
+      - ./paperless/consume:/opt/sync
+      - ./rclone/config:/config/rclone
+    entrypoint: sh -c "echo \"sleeping for 60s\" && sleep 60 && rclone --config /config/rclone --include \*.pdf sync GoogleDrive:Documenten/scannerpro/Home /opt/sync"
+ 
